@@ -14,7 +14,7 @@ https://opensource.org/licenses/mit-license.php
 bl_info = {
     "name": "VRM format",
     "author": "saturday06, iCyP",
-    "version": (2, 4, 8),
+    "version": (2, 5, 0),
     "blender": (2, 83, 0),
     "location": "File > Import-Export",
     "description": "Import-Edit-Export VRM",
@@ -28,18 +28,22 @@ bl_info = {
 
 
 def register() -> None:
-    import contextlib
     import os
-    import sys
     import zipfile
+    from logging import getLogger
 
     import bpy
 
+    logger = getLogger(__name__)
+
     if bpy.app.version < bl_info["blender"]:
-        raise Exception(
+        raise NotImplementedError(
             f"This add-on doesn't support Blender version less than {bl_info['blender']} "
             + f"but the current version is {bpy.app.version}"
         )
+
+    # https://github.com/saturday06/VRM_Addon_for_Blender/blob/c44773da5e6232a5dc06ae768978844258fc0712/io_scene_vrm/common/logging.py#L5-L7
+    log_warning_prefix = "[VRM Add-on:Warning]"
 
     # For users who have acquired the add-on from "Code" -> "Download ZIP" on GitHub.
     github_code_download_zip_path = os.path.join(
@@ -49,19 +53,25 @@ def register() -> None:
         "_".join(map(str, bl_info["version"])) + ".zip",
     )
     if os.path.exists(github_code_download_zip_path):
-        sys.stdout.write(
-            "[VRM Add-on] Unzipping the partial add-on archive for "
-            + 'users who have acquired the add-on from "Code" -> "Download ZIP" on GitHub... '
+        logger.warning(
+            "%s Unzipping the partial add-on archive for "
+            'users who have acquired the add-on from "Code" -> "Download ZIP" on GitHub ...',
+            log_warning_prefix,
         )
-        sys.stdout.flush()
 
         with zipfile.ZipFile(github_code_download_zip_path, "r") as z:
             z.extractall(os.path.dirname(__file__))
-        with contextlib.suppress(FileNotFoundError, PermissionError):
-            os.remove(github_code_download_zip_path)
 
-        sys.stdout.write("ok\n")
-        sys.stdout.flush()
+        try:
+            os.remove(github_code_download_zip_path)
+        except (FileNotFoundError, PermissionError):
+            logger.exception(
+                "%s Failed to remove the partial add-on archive: %s",
+                log_warning_prefix,
+                github_code_download_zip_path,
+            )
+
+        logger.warning("%s ...OK", log_warning_prefix)
 
     # Lazy import to minimize initialization before blender version checking and
     # unzipping the partial add-on archive.
