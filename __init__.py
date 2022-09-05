@@ -14,7 +14,7 @@ https://opensource.org/licenses/mit-license.php
 bl_info = {
     "name": "VRM format",
     "author": "saturday06, iCyP",
-    "version": (2, 5, 0),
+    "version": (2, 5, 1),
     "blender": (2, 83, 0),
     "location": "File > Import-Export",
     "description": "Import-Edit-Export VRM",
@@ -42,7 +42,7 @@ def register() -> None:
             + f"but the current version is {bpy.app.version}"
         )
 
-    # https://github.com/saturday06/VRM_Addon_for_Blender/blob/c44773da5e6232a5dc06ae768978844258fc0712/io_scene_vrm/common/logging.py#L5-L7
+    # https://github.com/saturday06/VRM_Addon_for_Blender/blob/2_5_0/io_scene_vrm/common/logging.py#L5-L7
     log_warning_prefix = "[VRM Add-on:Warning]"
 
     # For users who have acquired the add-on from "Code" -> "Download ZIP" on GitHub.
